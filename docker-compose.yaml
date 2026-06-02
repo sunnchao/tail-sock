@@ -1,0 +1,14 @@
+services:
+  socks:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tailscale-socks5
+    hostname: docker-socks5
+    env_file:
+      - .env
+    volumes:
+      - ./state:/var/lib/tailscale
+    ports:
+      - "1056:1056"
+    restart: unless-stopped
