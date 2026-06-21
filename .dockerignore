@@ -1,0 +1,7 @@
+.git/
+.env
+state/
+.planning/
+*.log
+*.tmp
+.DS_Store

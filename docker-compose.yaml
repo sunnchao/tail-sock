@@ -10,5 +10,18 @@ services:
     volumes:
       - ./state:/var/lib/tailscale
     ports:
-      - "1056:1056"
+      - "${PROXY_BIND_ADDR:-127.0.0.1}:1056:1056"
+    healthcheck:
+      test: ["CMD-SHELL", "tailscale status >/dev/null 2>&1 && tailscale ip >/dev/null 2>&1 && curl --fail --silent --show-error --socks5-hostname 127.0.0.1:1055 https://ifconfig.me >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 256m
+    cpus: "1.0"
     restart: unless-stopped
