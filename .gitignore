@@ -6,3 +6,4 @@ state/
 
 # GSD 本地规划资料（按用户选择不提交）
 .planning/
+.commandcode/

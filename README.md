@@ -66,7 +66,7 @@ docker compose exec socks tailscale up --hostname=docker-socks5
 docker compose logs -f
 
 # 测试代理出口 IP
-curl --socks5 用户名:密码@127.0.0.1:1056 https://ifconfig.me
+curl --socks5-hostname 用户名:密码@127.0.0.1:1056 https://ifconfig.me
 
 # 运行自动 smoke test（不会打印密码）
 ./scripts/smoke-test.sh
@@ -149,7 +149,7 @@ docker compose up -d --force-recreate
 ./scripts/smoke-test.sh
 ```
 
-4. 如需确认旧密码失效，可临时用旧密码执行一次 `curl --socks5`，预期认证失败。
+4. 如需确认旧密码失效，可临时用旧密码执行一次 `curl --socks5-hostname`，预期认证失败。
 
 ### 升级
 
@@ -176,6 +176,7 @@ docker compose logs --tail=100
 | 容器 unhealthy | `docker compose ps`、`docker inspect tailscale-socks5 --format '{{json .State.Health}}'` | 查看 `docker compose logs --tail=100`，确认是否已完成 Tailscale 登录 |
 | Tailscale 未登录或登录失效 | `docker compose exec socks tailscale status` | 重新执行 `docker compose exec socks tailscale up --hostname=docker-socks5` |
 | Dante 认证失败 | `.env` 中的 `PROXY_USER` / `PROXY_PASS` | 确认不是 `XXX`，修改后 `docker compose up -d --force-recreate` |
+| 访问 `Tailscale内网` 域名时报 `Could not resolve host` | curl 参数是否使用远端 DNS | 使用 `curl --socks5-hostname 用户名:密码@127.0.0.1:1056 http://目标.tailscale内网域名:端口/`，或使用 `--proxy socks5h://用户名:密码@127.0.0.1:1056` |
 | 代理测试卡住或出口不对 | `./scripts/smoke-test.sh`、`docker compose logs --tail=100` | 先确认容器健康，再检查 `danted.conf` 的 `route` 和 Tailscale 状态 |
 | 需要重置身份 | `./state` | 按 “Tailscale 状态目录” 小节移动旧 state 并重新登录 |
 | 日志增长过快 | `docker inspect tailscale-socks5 --format '{{json .HostConfig.LogConfig}}'` | 确认 Compose logging 配置生效，必要时降低日志级别或排查重启循环 |
